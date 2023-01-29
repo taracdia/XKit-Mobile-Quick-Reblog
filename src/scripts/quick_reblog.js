@@ -149,16 +149,6 @@ const setLastPostId = (currentTarget) => {
   lastPostID = thisPostID;
 }
 
-const showPopupOnHover = ({ currentTarget }) => {
-  console.log('hello')
-  clearTimeout(timeoutID);
-
-  currentTarget.closest('div').appendChild(popupElement);
-  popupElement.parentNode.addEventListener('mouseleave', removePopupOnLeave);
-
-  setLastPostId(currentTarget);
-};
-
 const removePopupOnLeave = () => {
   timeoutID = setTimeout(() => {
     const { parentNode } = popupElement;
@@ -170,9 +160,6 @@ const removePopupOnLeave = () => {
 };
 
 const reblogOnLongClick = async ({ currentTarget }) => {
-  // currentTarget.closest('div').appendChild(popupElement);
-
-  console.log('showpopuponlongclick')
   setLastPostId(currentTarget);
 
   const currentReblogButton = currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement;
@@ -224,10 +211,8 @@ const reblogOnLongClick = async ({ currentTarget }) => {
         }
       }
     }
-  // } catch ({ body }) {
-  //   notify(body.errors[0].detail);
-} catch (e) {
-  console.log(e);
+  } catch ({ body }) {
+    notify(body.errors[0].detail);
   } finally {
     actionButtons.disabled = false;
   }
@@ -261,8 +246,6 @@ const startLongPress = function(e) {
 };
 
 const makeButtonReblogged = ({ buttonDiv, state }) => {
-  console.log(buttonDiv)
-  console.log(state)
   ['published', 'queue', 'draft'].forEach(className => buttonDiv.classList.remove(className));
   buttonDiv.classList.add(state);
 };
@@ -329,22 +312,6 @@ const reblogPost = async function ({ currentTarget }) {
   button.addEventListener('click', reblogPost);
   actionButtons.appendChild(button);
 });
-
-const processPosts = async function (postElements) {
-  const { [alreadyRebloggedStorageKey]: alreadyRebloggedList = [] } = await browser.storage.local.get(alreadyRebloggedStorageKey);
-  filterPostElements(postElements).forEach(async postElement => {
-    const { id } = postElement.dataset;
-    const { rebloggedRootId } = await timelineObject(postElement);
-
-    const rootID = rebloggedRootId || id;
-
-    if (alreadyRebloggedList.includes(rootID)) {
-      const reblogLink = postElement.querySelector(reblogButtonSelector);
-      const buttonDiv = reblogLink?.closest('div');
-      if (buttonDiv) makeButtonReblogged({ buttonDiv, state: 'published' });
-    }
-  });
-};
 
 const renderQuickTags = async function () {
   quickTagsList.textContent = '';
@@ -414,26 +381,6 @@ export const main = async function () {
     ...userBlogs.map(({ name, uuid }) => Object.assign(document.createElement('option'), { value: uuid, textContent: name }))
   );
 
-  if (rememberLastBlog) {
-    for (const { uuid } of userBlogs) {
-      blogHashes[uuid] = await sha256(uuid);
-    }
-
-    const { uuid: primaryUuid } = userBlogs.find(({ primary }) => primary === true);
-    accountKey = blogHashes[primaryUuid];
-
-    const {
-      [rememberedBlogStorageKey]: rememberedBlogs = {}
-    } = await browser.storage.local.get(rememberedBlogStorageKey);
-
-    const savedBlogHash = rememberedBlogs[accountKey];
-    const savedBlogUuid = Object.keys(blogHashes).find(uuid => blogHashes[uuid] === savedBlogHash);
-    if (savedBlogUuid) blogSelector.value = savedBlogUuid;
-
-    blogSelector.addEventListener('change', updateRememberedBlog);
-  }
-  renderBlogAvatar();
-
   blogSelectorContainer.hidden = !showBlogSelector;
   commentInput.hidden = !showCommentInput;
   quickTagsList.hidden = !quickTagsIntegration;
@@ -459,7 +406,6 @@ export const clean = async function () {
   blogSelector.removeEventListener('change', updateRememberedBlog);
 
   browser.storage.onChanged.removeListener(updateQuickTags);
-  onNewPosts.removeListener(processPosts);
 };
 
 export const stylesheet = true;

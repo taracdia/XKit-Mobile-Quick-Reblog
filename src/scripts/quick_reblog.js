@@ -19,9 +19,6 @@ queueButton.dataset.state = 'queue';
 const draftButton = Object.assign(document.createElement('button'), { textContent: 'Draft' });
 draftButton.dataset.state = 'draft';
 
-let lastPostID;
-
-let longpress = false;
 let presstimer = null;
 
 const reblogButtonSelector = `
@@ -33,7 +30,6 @@ const reblogOnLongClick = async ({ currentTarget }) => {
   const currentReblogButton = currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement;
 
   actionButtons.disabled = true;
-  lastPostID = null;
 
   const postElement = currentTarget.closest(postSelector);
   const postID = postElement.dataset.id;
@@ -81,12 +77,10 @@ const startLongPress = function(e) {
       return;
   }
 
-  longpress = false;
 
   if (presstimer === null) {
       presstimer = setTimeout(function() {
           reblogOnLongClick(e);
-          longpress = true;
           // this prevents the short click opening the usual reblog modal
           e.currentTarget.style.pointerEvents = 'none';
       }, 500);

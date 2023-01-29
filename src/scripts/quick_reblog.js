@@ -4,7 +4,6 @@ import { postSelector } from '../util/interface.js';
 import { userBlogs } from '../util/user.js';
 import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
-import { dom } from '../util/dom.js';
 
 const blogSelector = document.createElement('select');
 const commentInput = Object.assign(document.createElement('input'), {
@@ -24,8 +23,6 @@ let lastPostID;
 
 let longpress = false;
 let presstimer = null;
-
-const alreadyRebloggedStorageKey = 'quick_reblog.alreadyRebloggedList';
 
 const reblogButtonSelector = `
 ${postSelector} footer a[href*="/reblog/"],

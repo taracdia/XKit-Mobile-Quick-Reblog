@@ -63,27 +63,6 @@ const renderBlogAvatar = async () => {
 };
 blogSelector.addEventListener('change', renderBlogAvatar);
 
-const renderTagSuggestions = () => {
-  tagSuggestions.textContent = '';
-  if (!showTagSuggestions) return;
-
-  const currentTags = tagsInput.value
-    .split(',')
-    .map(tag => tag.trim().toLowerCase())
-    .filter(tag => tag !== '');
-
-  const includeSpace = !tagsInput.value.endsWith(' ') && tagsInput.value.trim() !== '';
-
-  const tagsToSuggest = suggestableTags
-    .filter(tag => !currentTags.includes(tag.toLowerCase()))
-    .filter((tag, index, array) => array.indexOf(tag) === index)
-    .map(tag => `${tagsInput.value}${includeSpace ? ' ' : ''}${tag}`);
-
-  tagSuggestions.append(
-    ...tagsToSuggest.map(value => Object.assign(document.createElement('option'), { value }))
-  );
-};
-
 const setLastPostId = (currentTarget) => {
   const thisPost = currentTarget.closest(postSelector);
   const thisPostID = thisPost.dataset.id;
@@ -96,7 +75,6 @@ const setLastPostId = (currentTarget) => {
       if (blogName) suggestableTags.push(blogName);
       if (rebloggedRootName) suggestableTags.push(rebloggedRootName);
       suggestableTags.push(postType({ trail, content, layout }));
-      renderTagSuggestions();
     });
   }
   lastPostID = thisPostID;

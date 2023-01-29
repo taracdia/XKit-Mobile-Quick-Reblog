@@ -36,8 +36,6 @@ draftButton.dataset.state = 'draft';
 let lastPostID;
 let suggestableTags;
 
-let rememberLastBlog;
-let showTagsInput;
 let showTagSuggestions;
 let reblogTag;
 let queueTag;
@@ -90,10 +88,6 @@ const setLastPostId = (currentTarget) => {
   const thisPost = currentTarget.closest(postSelector);
   const thisPostID = thisPost.dataset.id;
   if (thisPostID !== lastPostID) {
-    if (!rememberLastBlog) {
-      blogSelector.value = blogSelector.options[0].value;
-      renderBlogAvatar();
-    }
     commentInput.value = '';
     [...quickTagsList.children].forEach(({ dataset }) => delete dataset.checked);
     tagsInput.value = '';
@@ -193,8 +187,6 @@ const startLongPress = function(e) {
 
 export const main = async function () {
   ({
-    rememberLastBlog,
-    showTagsInput,
     showTagSuggestions,
     reblogTag,
     queueTag,

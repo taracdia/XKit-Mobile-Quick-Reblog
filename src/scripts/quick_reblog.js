@@ -96,35 +96,6 @@ const renderTagSuggestions = () => {
   );
 };
 
-const updateTagSuggestions = () => {
-  if (tagsInput.value.trim().endsWith(',') || tagsInput.value.trim() === '') {
-    renderTagSuggestions();
-  }
-};
-
-const doSmartQuotes = ({ currentTarget }) => {
-  const { value } = currentTarget;
-  currentTarget.value = value
-    .replace(/^"/, '\u201C')
-    .replace(/ "/g, ' \u201C')
-    .replace(/"/g, '\u201D');
-};
-
-const checkLength = ({ currentTarget }) => {
-  const { value } = currentTarget;
-  const tags = value.split(',').map(tag => tag.trim());
-  if (tags.some(tag => tag.length > 140)) {
-    tagsInput.setCustomValidity('Tag is longer than 140 characters!');
-    tagsInput.reportValidity();
-  } else {
-    tagsInput.setCustomValidity('');
-  }
-};
-
-tagsInput.addEventListener('input', updateTagSuggestions);
-tagsInput.addEventListener('input', doSmartQuotes);
-tagsInput.addEventListener('input', checkLength);
-
 const setLastPostId = (currentTarget) => {
   const thisPost = currentTarget.closest(postSelector);
   const thisPostID = thisPost.dataset.id;
@@ -146,10 +117,6 @@ const setLastPostId = (currentTarget) => {
   }
   lastPostID = thisPostID;
 }
-
-const removePopupOnLeave = () => {
-
-};
 
 const reblogOnLongClick = async ({ currentTarget }) => {
   setLastPostId(currentTarget);
@@ -232,58 +199,6 @@ const startLongPress = function(e) {
   }
 
   return false;
-};
-
-const makeButtonReblogged = ({ buttonDiv, state }) => {
-  ['published', 'queue', 'draft'].forEach(className => buttonDiv.classList.remove(className));
-  buttonDiv.classList.add(state);
-};
-
-const renderQuickTags = async function () {
-  quickTagsList.textContent = '';
-
-  const { [quickTagsStorageKey]: tagBundles = [] } = await browser.storage.local.get(quickTagsStorageKey);
-  tagBundles.forEach(tagBundle => {
-    const bundleTags = tagBundle.tags.split(',').map(tag => tag.trim().toLowerCase());
-    const bundleButton = document.createElement('button');
-    bundleButton.textContent = tagBundle.title;
-    bundleButton.addEventListener('click', ({ currentTarget: { dataset } }) => {
-      const checked = dataset.checked === 'true';
-
-      if (checked) {
-        tagsInput.value = tagsInput.value
-          .split(',')
-          .map(tag => tag.trim())
-          .filter(tag => bundleTags.includes(tag.toLowerCase()) === false)
-          .join(', ');
-      } else {
-        tagsInput.value.trim() === ''
-          ? tagsInput.value = tagBundle.tags
-          : tagsInput.value += `, ${tagBundle.tags}`;
-      }
-
-      dataset.checked = !checked;
-    });
-
-    quickTagsList.appendChild(bundleButton);
-  });
-};
-
-const updateQuickTags = (changes, areaName) => {
-  if (areaName === 'local' && Object.keys(changes).includes(quickTagsStorageKey)) {
-    renderQuickTags();
-  }
-};
-
-const updateRememberedBlog = async ({ currentTarget: { value: selectedBlog } }) => {
-  const {
-    [rememberedBlogStorageKey]: rememberedBlogs = {}
-  } = await browser.storage.local.get(rememberedBlogStorageKey);
-
-  const selectedBlogHash = blogHashes[selectedBlog];
-
-  rememberedBlogs[accountKey] = selectedBlogHash;
-  browser.storage.local.set({ [rememberedBlogStorageKey]: rememberedBlogs });
 };
 
 export const main = async function () {

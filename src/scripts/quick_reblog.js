@@ -7,22 +7,11 @@ import { translate } from '../util/language_data.js';
 import { dom } from '../util/dom.js';
 
 const blogSelector = document.createElement('select');
-const blogAvatar = dom('div', { class: 'avatar' });
 const commentInput = Object.assign(document.createElement('input'), {
   placeholder: 'Comment',
   autocomplete: 'off',
   onkeydown: event => event.stopPropagation()
 });
-const quickTagsList = Object.assign(document.createElement('div'), {
-  className: 'quick-tags',
-  tabIndex: -1
-});
-const tagsInput = Object.assign(document.createElement('input'), {
-  placeholder: 'Tags (comma separated)',
-  autocomplete: 'off',
-  onkeydown: event => event.stopPropagation()
-});
-tagsInput.setAttribute('list', 'quick-reblog-tag-suggestions');
 const actionButtons = Object.assign(document.createElement('fieldset'), { className: 'action-buttons' });
 const reblogButton = Object.assign(document.createElement('button'), { textContent: 'Reblog' });
 reblogButton.dataset.state = 'published';

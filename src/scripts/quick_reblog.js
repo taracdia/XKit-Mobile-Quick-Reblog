@@ -34,9 +34,7 @@ const draftButton = Object.assign(document.createElement('button'), { textConten
 draftButton.dataset.state = 'draft';
 
 let lastPostID;
-let suggestableTags;
 
-let reblogTag;
 let queueTag;
 let alreadyRebloggedEnabled;
 let alreadyRebloggedLimit;
@@ -62,11 +60,7 @@ const reblogOnLongClick = async ({ currentTarget }) => {
   const state = 'published'
 
   const blog = blogSelector.value;
-  const tags = [
-    ...tagsInput.value.split(','),
-    ...reblogTag ? [reblogTag] : [],
-    ...(state === 'queue' && queueTag) ? [queueTag] : []
-  ].join(',');
+  const tags = ''
   const { blog: { uuid: parentTumblelogUUID }, reblogKey, rebloggedRootId } = await timelineObject(postElement);
 
   const requestPath = `/v2/blog/${blog}/posts`;
@@ -134,7 +128,6 @@ const startLongPress = function(e) {
 
 export const main = async function () {
   ({
-    reblogTag,
     queueTag,
     alreadyRebloggedEnabled,
     alreadyRebloggedLimit

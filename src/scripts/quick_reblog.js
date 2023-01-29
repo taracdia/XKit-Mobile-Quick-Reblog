@@ -5,12 +5,6 @@ import { userBlogs } from '../util/user.js';
 import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
 
-const commentInput = Object.assign(document.createElement('input'), {
-  placeholder: 'Comment',
-  autocomplete: 'off',
-  onkeydown: event => event.stopPropagation()
-});
-
 let pressTimer = null;
 
 const reblogButtonSelector = `

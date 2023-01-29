@@ -438,44 +438,21 @@ export const main = async function () {
   commentInput.hidden = !showCommentInput;
   quickTagsList.hidden = !quickTagsIntegration;
   tagsInput.hidden = !showTagsInput;
-
-  // todo temp disable
-  // $(document.body).on('mouseenter', reblogButtonSelector, showPopupOnHover);
-  
-  // todo turn off showpopuponhover and its removal when in mobile mode and maybe turn off the below in non mobile not sure yet
   $(document.body).on('mousedown', reblogButtonSelector, startLongPress);
   $(document.body).on('touchstart', reblogButtonSelector, startLongPress);
   $(document.body).on('mouseout', reblogButtonSelector, cancelLongPress);
   $(document.body).on('touchend', reblogButtonSelector, cancelLongPress);
   $(document.body).on('touchleave', reblogButtonSelector, cancelLongPress);
   $(document.body).on('touchcancel', reblogButtonSelector, cancelLongPress);
-
-  // $(document.body).on('click', clickOutsidePopup);
-
-  if (quickTagsIntegration) {
-    browser.storage.onChanged.addListener(updateQuickTags);
-    renderQuickTags();
-  }
-
-  if (alreadyRebloggedEnabled) {
-    onNewPosts.addListener(processPosts);
-  }
 };
 
 export const clean = async function () {
-  // todo temp disable
-  // $(document.body).off('mouseenter', reblogButtonSelector, showPopupOnHover);
-
-  // todo turn off showpopuponhover and its removal when in mobile mode and maybe turn off the below in non mobile not sure yet
   $(document.body).off('mousedown', reblogButtonSelector, startLongPress);
   $(document.body).off('touchstart', reblogButtonSelector, startLongPress);
-  $(document.body).off('click', reblogButtonSelector, click);
   $(document.body).off('mouseout', reblogButtonSelector, cancelLongPress);
   $(document.body).off('touchend', reblogButtonSelector, cancelLongPress);
   $(document.body).off('touchleave', reblogButtonSelector, cancelLongPress);
   $(document.body).off('touchcancel', reblogButtonSelector, cancelLongPress);
-
-  // $(document.body).off('click', clickOutsidePopup);
 
   popupElement.remove();
 

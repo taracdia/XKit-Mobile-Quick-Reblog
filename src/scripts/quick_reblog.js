@@ -2,7 +2,6 @@ import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
 import { postSelector } from '../util/interface.js';
 import { userBlogs } from '../util/user.js';
-import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
 
 let pressTimer = null;
@@ -38,11 +37,9 @@ const reblogOnLongClick = async ({ currentTarget }) => {
     const { meta, response } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
     if (meta.status === 201) {
       currentReblogButton.classList.add('published')
-
-      notify(response.displayText);
     }
   } catch ({ body }) {
-    notify(body.errors[0].detail);
+    console.log(body.errors[0].detail);
   }
 };
 

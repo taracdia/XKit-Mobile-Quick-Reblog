@@ -9,7 +9,6 @@ import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
 import { dom } from '../util/dom.js';
 
-const popupElement = Object.assign(document.createElement('div'), { id: 'quick-reblog' });
 const blogSelector = document.createElement('select');
 const blogAvatar = dom('div', { class: 'avatar' });
 const blogSelectorContainer = dom('div', { class: 'select-container' }, null, [blogAvatar, blogSelector]);
@@ -36,7 +35,6 @@ const queueButton = Object.assign(document.createElement('button'), { textConten
 queueButton.dataset.state = 'queue';
 const draftButton = Object.assign(document.createElement('button'), { textContent: 'Draft' });
 draftButton.dataset.state = 'draft';
-[blogSelectorContainer, commentInput, quickTagsList, tagsInput, tagSuggestions, actionButtons].forEach(element => popupElement.appendChild(element));
 
 let lastPostID;
 let timeoutID;
@@ -150,13 +148,7 @@ const setLastPostId = (currentTarget) => {
 }
 
 const removePopupOnLeave = () => {
-  timeoutID = setTimeout(() => {
-    const { parentNode } = popupElement;
-    if (parentNode?.matches(':hover, :active, :focus-within') === false) {
-      parentNode?.removeEventListener('mouseleave', removePopupOnLeave);
-      popupElement.remove();
-    }
-  }, 500);
+
 };
 
 const reblogOnLongClick = async ({ currentTarget }) => {
@@ -194,9 +186,6 @@ const reblogOnLongClick = async ({ currentTarget }) => {
     const { meta, response } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
     if (meta.status === 201) {
       currentReblogButton.classList.add('published')
-      if (lastPostID === null) {
-        popupElement.remove();
-      }
 
       notify(response.displayText);
 
@@ -249,69 +238,6 @@ const makeButtonReblogged = ({ buttonDiv, state }) => {
   ['published', 'queue', 'draft'].forEach(className => buttonDiv.classList.remove(className));
   buttonDiv.classList.add(state);
 };
-
-const reblogPost = async function ({ currentTarget }) {
-  const currentReblogButton = popupElement.parentNode;
-
-  currentTarget.blur();
-  actionButtons.disabled = true;
-  lastPostID = null;
-
-  const postElement = currentTarget.closest(postSelector);
-  const postID = postElement.dataset.id;
-  const { state } = currentTarget.dataset;
-
-  const blog = blogSelector.value;
-  const tags = [
-    ...tagsInput.value.split(','),
-    ...reblogTag ? [reblogTag] : [],
-    ...(state === 'queue' && queueTag) ? [queueTag] : []
-  ].join(',');
-  const { blog: { uuid: parentTumblelogUUID }, reblogKey, rebloggedRootId } = await timelineObject(postElement);
-
-  const requestPath = `/v2/blog/${blog}/posts`;
-
-  const requestBody = {
-    content: commentInput.value ? [{ formatting: [], type: 'text', text: commentInput.value }] : [],
-    tags,
-    parent_post_id: postID,
-    parent_tumblelog_uuid: parentTumblelogUUID,
-    reblog_key: reblogKey,
-    state
-  };
-
-  try {
-    const { meta, response } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
-    if (meta.status === 201) {
-      makeButtonReblogged({ buttonDiv: currentReblogButton, state });
-      if (lastPostID === null) {
-        popupElement.remove();
-      }
-
-      notify(response.displayText);
-
-      if (alreadyRebloggedEnabled) {
-        const { [alreadyRebloggedStorageKey]: alreadyRebloggedList = [] } = await browser.storage.local.get(alreadyRebloggedStorageKey);
-        const rootID = rebloggedRootId || postID;
-
-        if (alreadyRebloggedList.includes(rootID) === false) {
-          alreadyRebloggedList.push(rootID);
-          alreadyRebloggedList.splice(0, alreadyRebloggedList.length - alreadyRebloggedLimit);
-          await browser.storage.local.set({ [alreadyRebloggedStorageKey]: alreadyRebloggedList });
-        }
-      }
-    }
-  } catch ({ body }) {
-    notify(body.errors[0].detail);
-  } finally {
-    actionButtons.disabled = false;
-  }
-};
-
-[reblogButton, queueButton, draftButton].forEach(button => {
-  button.addEventListener('click', reblogPost);
-  actionButtons.appendChild(button);
-});
 
 const renderQuickTags = async function () {
   quickTagsList.textContent = '';

@@ -46,22 +46,11 @@ let longpress = false;
 let presstimer = null;
 
 const alreadyRebloggedStorageKey = 'quick_reblog.alreadyRebloggedList';
-const rememberedBlogStorageKey = 'quick_reblog.rememberedBlogs';
-const quickTagsStorageKey = 'quick_tags.preferences.tagBundles';
-const blogHashes = {};
 
 const reblogButtonSelector = `
 ${postSelector} footer a[href*="/reblog/"],
 ${postSelector} footer button[aria-label="${translate('Reblog')}"]:not([role])
 `;
-
-const renderBlogAvatar = async () => {
-  const { value: selectedUuid } = blogSelector;
-  const { avatar } = userBlogs.find(({ uuid }) => uuid === selectedUuid);
-  const { url } = avatar[avatar.length - 1];
-  blogAvatar.style.backgroundImage = `url(${url})`;
-};
-blogSelector.addEventListener('change', renderBlogAvatar);
 
 const setLastPostId = (currentTarget) => {
   const thisPost = currentTarget.closest(postSelector);

@@ -375,16 +375,10 @@ export const main = async function () {
     alreadyRebloggedLimit
   } = await getPreferences('quick_reblog'));
 
-  popupElement.className = popupPosition;
-
   blogSelector.replaceChildren(
     ...userBlogs.map(({ name, uuid }) => Object.assign(document.createElement('option'), { value: uuid, textContent: name }))
   );
 
-  blogSelectorContainer.hidden = !showBlogSelector;
-  commentInput.hidden = !showCommentInput;
-  quickTagsList.hidden = !quickTagsIntegration;
-  tagsInput.hidden = !showTagsInput;
   $(document.body).on('mousedown', reblogButtonSelector, startLongPress);
   $(document.body).on('touchstart', reblogButtonSelector, startLongPress);
   $(document.body).on('mouseout', reblogButtonSelector, cancelLongPress);
@@ -400,12 +394,6 @@ export const clean = async function () {
   $(document.body).off('touchend', reblogButtonSelector, cancelLongPress);
   $(document.body).off('touchleave', reblogButtonSelector, cancelLongPress);
   $(document.body).off('touchcancel', reblogButtonSelector, cancelLongPress);
-
-  popupElement.remove();
-
-  blogSelector.removeEventListener('change', updateRememberedBlog);
-
-  browser.storage.onChanged.removeListener(updateQuickTags);
 };
 
 export const stylesheet = true;

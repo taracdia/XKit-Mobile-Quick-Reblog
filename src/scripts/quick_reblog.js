@@ -169,13 +169,13 @@ const removePopupOnLeave = () => {
   }, 500);
 };
 
-const showPopupOnLongClick = async ({ currentTarget }) => {
+const reblogOnLongClick = async ({ currentTarget }) => {
   // currentTarget.closest('div').appendChild(popupElement);
 
   console.log('showpopuponlongclick')
   setLastPostId(currentTarget);
 
-  const currentReblogButton = currentTarget;
+  const currentReblogButton = currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement;
 
   actionButtons.disabled = true;
   lastPostID = null;
@@ -206,7 +206,7 @@ const showPopupOnLongClick = async ({ currentTarget }) => {
   try {
     const { meta, response } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
     if (meta.status === 201) {
-      makeButtonReblogged({ buttonDiv: currentReblogButton, state });
+      currentReblogButton.classList.add('published')
       if (lastPostID === null) {
         popupElement.remove();
       }
@@ -224,8 +224,10 @@ const showPopupOnLongClick = async ({ currentTarget }) => {
         }
       }
     }
-  } catch ({ body }) {
-    notify(body.errors[0].detail);
+  // } catch ({ body }) {
+  //   notify(body.errors[0].detail);
+} catch (e) {
+  console.log(e);
   } finally {
     actionButtons.disabled = false;
   }
@@ -248,7 +250,7 @@ const startLongPress = function(e) {
 
   if (presstimer === null) {
       presstimer = setTimeout(function() {
-          showPopupOnLongClick(e);
+          reblogOnLongClick(e);
           longpress = true;
           // this prevents the short click opening the usual reblog modal
           e.currentTarget.style.pointerEvents = 'none';
@@ -259,6 +261,8 @@ const startLongPress = function(e) {
 };
 
 const makeButtonReblogged = ({ buttonDiv, state }) => {
+  console.log(buttonDiv)
+  console.log(state)
   ['published', 'queue', 'draft'].forEach(className => buttonDiv.classList.remove(className));
   buttonDiv.classList.add(state);
 };

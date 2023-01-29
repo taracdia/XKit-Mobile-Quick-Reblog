@@ -55,6 +55,10 @@ let queueTag;
 let alreadyRebloggedEnabled;
 let alreadyRebloggedLimit;
 
+let longpress = false;
+let presstimer = null;
+let longtarget = null;
+
 const alreadyRebloggedStorageKey = 'quick_reblog.alreadyRebloggedList';
 const rememberedBlogStorageKey = 'quick_reblog.rememberedBlogs';
 const quickTagsStorageKey = 'quick_tags.preferences.tagBundles';
@@ -123,12 +127,7 @@ tagsInput.addEventListener('input', updateTagSuggestions);
 tagsInput.addEventListener('input', doSmartQuotes);
 tagsInput.addEventListener('input', checkLength);
 
-const showPopupOnHover = ({ currentTarget }) => {
-  clearTimeout(timeoutID);
-
-  currentTarget.closest('div').appendChild(popupElement);
-  popupElement.parentNode.addEventListener('mouseleave', removePopupOnLeave);
-
+const setLastPostId = (currentTarget) => {
   const thisPost = currentTarget.closest(postSelector);
   const thisPostID = thisPost.dataset.id;
   if (thisPostID !== lastPostID) {
@@ -148,6 +147,16 @@ const showPopupOnHover = ({ currentTarget }) => {
     });
   }
   lastPostID = thisPostID;
+}
+
+const showPopupOnHover = ({ currentTarget }) => {
+  console.log('hello')
+  clearTimeout(timeoutID);
+
+  currentTarget.closest('div').appendChild(popupElement);
+  popupElement.parentNode.addEventListener('mouseleave', removePopupOnLeave);
+
+  setLastPostId(currentTarget);
 };
 
 const removePopupOnLeave = () => {
@@ -158,6 +167,95 @@ const removePopupOnLeave = () => {
       popupElement.remove();
     }
   }, 500);
+};
+
+const showPopupOnLongClick = async ({ currentTarget }) => {
+  // currentTarget.closest('div').appendChild(popupElement);
+
+  console.log('showpopuponlongclick')
+  setLastPostId(currentTarget);
+
+  const currentReblogButton = currentTarget;
+
+  actionButtons.disabled = true;
+  lastPostID = null;
+
+  const postElement = currentTarget.closest(postSelector);
+  const postID = postElement.dataset.id;
+  const state = 'published'
+
+  const blog = blogSelector.value;
+  const tags = [
+    ...tagsInput.value.split(','),
+    ...reblogTag ? [reblogTag] : [],
+    ...(state === 'queue' && queueTag) ? [queueTag] : []
+  ].join(',');
+  const { blog: { uuid: parentTumblelogUUID }, reblogKey, rebloggedRootId } = await timelineObject(postElement);
+
+  const requestPath = `/v2/blog/${blog}/posts`;
+
+  const requestBody = {
+    content: commentInput.value ? [{ formatting: [], type: 'text', text: commentInput.value }] : [],
+    tags,
+    parent_post_id: postID,
+    parent_tumblelog_uuid: parentTumblelogUUID,
+    reblog_key: reblogKey,
+    state
+  };
+
+  try {
+    const { meta, response } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
+    if (meta.status === 201) {
+      makeButtonReblogged({ buttonDiv: currentReblogButton, state });
+      if (lastPostID === null) {
+        popupElement.remove();
+      }
+
+      notify(response.displayText);
+
+      if (alreadyRebloggedEnabled) {
+        const { [alreadyRebloggedStorageKey]: alreadyRebloggedList = [] } = await browser.storage.local.get(alreadyRebloggedStorageKey);
+        const rootID = rebloggedRootId || postID;
+
+        if (alreadyRebloggedList.includes(rootID) === false) {
+          alreadyRebloggedList.push(rootID);
+          alreadyRebloggedList.splice(0, alreadyRebloggedList.length - alreadyRebloggedLimit);
+          await browser.storage.local.set({ [alreadyRebloggedStorageKey]: alreadyRebloggedList });
+        }
+      }
+    }
+  } catch ({ body }) {
+    notify(body.errors[0].detail);
+  } finally {
+    actionButtons.disabled = false;
+  }
+
+};
+
+const cancelLongPress = function(e) {
+  if (presstimer !== null) {
+      clearTimeout(presstimer);
+      presstimer = null;
+  }
+};
+
+const startLongPress = function(e) {
+  if (e.type === "click" && e.button !== 0) {
+      return;
+  }
+
+  longpress = false;
+
+  if (presstimer === null) {
+      presstimer = setTimeout(function() {
+          showPopupOnLongClick(e);
+          longpress = true;
+          // this prevents the short click opening the usual reblog modal
+          e.currentTarget.style.pointerEvents = 'none';
+      }, 500);
+  }
+
+  return false;
 };
 
 const makeButtonReblogged = ({ buttonDiv, state }) => {
@@ -337,7 +435,18 @@ export const main = async function () {
   quickTagsList.hidden = !quickTagsIntegration;
   tagsInput.hidden = !showTagsInput;
 
-  $(document.body).on('mouseenter', reblogButtonSelector, showPopupOnHover);
+  // todo temp disable
+  // $(document.body).on('mouseenter', reblogButtonSelector, showPopupOnHover);
+  
+  // todo turn off showpopuponhover and its removal when in mobile mode and maybe turn off the below in non mobile not sure yet
+  $(document.body).on('mousedown', reblogButtonSelector, startLongPress);
+  $(document.body).on('touchstart', reblogButtonSelector, startLongPress);
+  $(document.body).on('mouseout', reblogButtonSelector, cancelLongPress);
+  $(document.body).on('touchend', reblogButtonSelector, cancelLongPress);
+  $(document.body).on('touchleave', reblogButtonSelector, cancelLongPress);
+  $(document.body).on('touchcancel', reblogButtonSelector, cancelLongPress);
+
+  // $(document.body).on('click', clickOutsidePopup);
 
   if (quickTagsIntegration) {
     browser.storage.onChanged.addListener(updateQuickTags);
@@ -350,7 +459,20 @@ export const main = async function () {
 };
 
 export const clean = async function () {
-  $(document.body).off('mouseenter', reblogButtonSelector, showPopupOnHover);
+  // todo temp disable
+  // $(document.body).off('mouseenter', reblogButtonSelector, showPopupOnHover);
+
+  // todo turn off showpopuponhover and its removal when in mobile mode and maybe turn off the below in non mobile not sure yet
+  $(document.body).off('mousedown', reblogButtonSelector, startLongPress);
+  $(document.body).off('touchstart', reblogButtonSelector, startLongPress);
+  $(document.body).off('click', reblogButtonSelector, click);
+  $(document.body).off('mouseout', reblogButtonSelector, cancelLongPress);
+  $(document.body).off('touchend', reblogButtonSelector, cancelLongPress);
+  $(document.body).off('touchleave', reblogButtonSelector, cancelLongPress);
+  $(document.body).off('touchcancel', reblogButtonSelector, cancelLongPress);
+
+  // $(document.body).off('click', clickOutsidePopup);
+
   popupElement.remove();
 
   blogSelector.removeEventListener('change', updateRememberedBlog);

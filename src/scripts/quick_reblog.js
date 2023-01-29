@@ -11,9 +11,6 @@ const commentInput = Object.assign(document.createElement('input'), {
   autocomplete: 'off',
   onkeydown: event => event.stopPropagation()
 });
-const actionButtons = Object.assign(document.createElement('fieldset'), { className: 'action-buttons' });
-const reblogButton = Object.assign(document.createElement('button'), { textContent: 'Reblog' });
-reblogButton.dataset.state = 'published';
 const queueButton = Object.assign(document.createElement('button'), { textContent: 'Queue' });
 queueButton.dataset.state = 'queue';
 const draftButton = Object.assign(document.createElement('button'), { textContent: 'Draft' });
@@ -28,8 +25,6 @@ ${postSelector} footer button[aria-label="${translate('Reblog')}"]:not([role])
 
 const reblogOnLongClick = async ({ currentTarget }) => {
   const currentReblogButton = currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement;
-
-  actionButtons.disabled = true;
 
   const postElement = currentTarget.closest(postSelector);
   const postID = postElement.dataset.id;
@@ -59,8 +54,6 @@ const reblogOnLongClick = async ({ currentTarget }) => {
     }
   } catch ({ body }) {
     notify(body.errors[0].detail);
-  } finally {
-    actionButtons.disabled = false;
   }
 
 };

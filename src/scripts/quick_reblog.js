@@ -36,7 +36,6 @@ draftButton.dataset.state = 'draft';
 let lastPostID;
 let suggestableTags;
 
-let showTagSuggestions;
 let reblogTag;
 let queueTag;
 let alreadyRebloggedEnabled;
@@ -52,26 +51,7 @@ ${postSelector} footer a[href*="/reblog/"],
 ${postSelector} footer button[aria-label="${translate('Reblog')}"]:not([role])
 `;
 
-const setLastPostId = (currentTarget) => {
-  const thisPost = currentTarget.closest(postSelector);
-  const thisPostID = thisPost.dataset.id;
-  if (thisPostID !== lastPostID) {
-    commentInput.value = '';
-    [...quickTagsList.children].forEach(({ dataset }) => delete dataset.checked);
-    tagsInput.value = '';
-    timelineObject(thisPost).then(({ tags, trail, content, layout, blogName, rebloggedRootName }) => {
-      suggestableTags = tags;
-      if (blogName) suggestableTags.push(blogName);
-      if (rebloggedRootName) suggestableTags.push(rebloggedRootName);
-      suggestableTags.push(postType({ trail, content, layout }));
-    });
-  }
-  lastPostID = thisPostID;
-}
-
 const reblogOnLongClick = async ({ currentTarget }) => {
-  setLastPostId(currentTarget);
-
   const currentReblogButton = currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement;
 
   actionButtons.disabled = true;
@@ -154,7 +134,6 @@ const startLongPress = function(e) {
 
 export const main = async function () {
   ({
-    showTagSuggestions,
     reblogTag,
     queueTag,
     alreadyRebloggedEnabled,

@@ -2,13 +2,12 @@ import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
 import { postSelector } from '../util/interface.js';
 import { userBlogs } from '../util/user.js';
-import { translate } from '../util/language_data.js';
 
 let pressTimer = null;
 
 const reblogButtonSelector = `
 ${postSelector} footer a[href*="/reblog/"],
-${postSelector} footer button[aria-label="${translate('Reblog')}"]:not([role])
+${postSelector} footer button[aria-label="Reblog"]:not([role])
 `;
 
 const reblogOnLongClick = async ({ currentTarget }) => {
@@ -20,7 +19,7 @@ const reblogOnLongClick = async ({ currentTarget }) => {
 
   const blog = userBlogs[0].uuid;
   const tags = ''
-  const { blog: { uuid: parentTumblelogUUID }, reblogKey, rebloggedRootId } = await timelineObject(postElement);
+  const { blog: { uuid: parentTumblelogUUID }, reblogKey } = await timelineObject(postElement);
 
   const requestPath = `/v2/blog/${blog}/posts`;
 
@@ -34,7 +33,7 @@ const reblogOnLongClick = async ({ currentTarget }) => {
   };
 
   try {
-    const { meta, response } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
+    const { meta } = await apiFetch(requestPath, { method: 'POST', body: requestBody });
     if (meta.status === 201) {
       currentReblogButton.classList.add('published')
     }

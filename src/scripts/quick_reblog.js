@@ -5,18 +5,13 @@ import { userBlogs } from '../util/user.js';
 import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
 
-const blogSelector = document.createElement('select');
 const commentInput = Object.assign(document.createElement('input'), {
   placeholder: 'Comment',
   autocomplete: 'off',
   onkeydown: event => event.stopPropagation()
 });
-const queueButton = Object.assign(document.createElement('button'), { textContent: 'Queue' });
-queueButton.dataset.state = 'queue';
-const draftButton = Object.assign(document.createElement('button'), { textContent: 'Draft' });
-draftButton.dataset.state = 'draft';
 
-let presstimer = null;
+let pressTimer = null;
 
 const reblogButtonSelector = `
 ${postSelector} footer a[href*="/reblog/"],
@@ -30,14 +25,14 @@ const reblogOnLongClick = async ({ currentTarget }) => {
   const postID = postElement.dataset.id;
   const state = 'published'
 
-  const blog = blogSelector.value;
+  const blog = userBlogs[0].uuid;
   const tags = ''
   const { blog: { uuid: parentTumblelogUUID }, reblogKey, rebloggedRootId } = await timelineObject(postElement);
 
   const requestPath = `/v2/blog/${blog}/posts`;
 
   const requestBody = {
-    content: commentInput.value ? [{ formatting: [], type: 'text', text: commentInput.value }] : [],
+    content: [],
     tags,
     parent_post_id: postID,
     parent_tumblelog_uuid: parentTumblelogUUID,
@@ -55,13 +50,12 @@ const reblogOnLongClick = async ({ currentTarget }) => {
   } catch ({ body }) {
     notify(body.errors[0].detail);
   }
-
 };
 
 const cancelLongPress = function(e) {
-  if (presstimer !== null) {
-      clearTimeout(presstimer);
-      presstimer = null;
+  if (pressTimer !== null) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
   }
 };
 
@@ -70,9 +64,8 @@ const startLongPress = function(e) {
       return;
   }
 
-
-  if (presstimer === null) {
-      presstimer = setTimeout(function() {
+  if (pressTimer === null) {
+      pressTimer = setTimeout(function() {
           reblogOnLongClick(e);
           // this prevents the short click opening the usual reblog modal
           e.currentTarget.style.pointerEvents = 'none';
@@ -83,10 +76,6 @@ const startLongPress = function(e) {
 };
 
 export const main = async function () {
-  blogSelector.replaceChildren(
-    ...userBlogs.map(({ name, uuid }) => Object.assign(document.createElement('option'), { value: uuid, textContent: name }))
-  );
-
   $(document.body).on('mousedown', reblogButtonSelector, startLongPress);
   $(document.body).on('touchstart', reblogButtonSelector, startLongPress);
   $(document.body).on('mouseout', reblogButtonSelector, cancelLongPress);

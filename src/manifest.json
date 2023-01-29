@@ -57,8 +57,7 @@
         "content_scripts/control_buttons.css",
         "content_scripts/meatballs.css",
         "content_scripts/sidebar.css",
-        "content_scripts/modals.css",
-        "content_scripts/post_actions.css"
+        "content_scripts/modals.css"
       ]
     }
   ],

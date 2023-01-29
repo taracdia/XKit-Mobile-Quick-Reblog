@@ -1,8 +1,7 @@
 import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
-import { postSelector, postType } from '../util/interface.js';
+import { postSelector } from '../util/interface.js';
 import { userBlogs } from '../util/user.js';
-import { getPreferences } from '../util/preferences.js';
 import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
 import { dom } from '../util/dom.js';
@@ -24,7 +23,6 @@ const tagsInput = Object.assign(document.createElement('input'), {
   onkeydown: event => event.stopPropagation()
 });
 tagsInput.setAttribute('list', 'quick-reblog-tag-suggestions');
-const tagSuggestions = Object.assign(document.createElement('datalist'), { id: 'quick-reblog-tag-suggestions' });
 const actionButtons = Object.assign(document.createElement('fieldset'), { className: 'action-buttons' });
 const reblogButton = Object.assign(document.createElement('button'), { textContent: 'Reblog' });
 reblogButton.dataset.state = 'published';
@@ -34,10 +32,6 @@ const draftButton = Object.assign(document.createElement('button'), { textConten
 draftButton.dataset.state = 'draft';
 
 let lastPostID;
-
-let queueTag;
-let alreadyRebloggedEnabled;
-let alreadyRebloggedLimit;
 
 let longpress = false;
 let presstimer = null;
@@ -80,17 +74,6 @@ const reblogOnLongClick = async ({ currentTarget }) => {
       currentReblogButton.classList.add('published')
 
       notify(response.displayText);
-
-      if (alreadyRebloggedEnabled) {
-        const { [alreadyRebloggedStorageKey]: alreadyRebloggedList = [] } = await browser.storage.local.get(alreadyRebloggedStorageKey);
-        const rootID = rebloggedRootId || postID;
-
-        if (alreadyRebloggedList.includes(rootID) === false) {
-          alreadyRebloggedList.push(rootID);
-          alreadyRebloggedList.splice(0, alreadyRebloggedList.length - alreadyRebloggedLimit);
-          await browser.storage.local.set({ [alreadyRebloggedStorageKey]: alreadyRebloggedList });
-        }
-      }
     }
   } catch ({ body }) {
     notify(body.errors[0].detail);
@@ -127,12 +110,6 @@ const startLongPress = function(e) {
 };
 
 export const main = async function () {
-  ({
-    queueTag,
-    alreadyRebloggedEnabled,
-    alreadyRebloggedLimit
-  } = await getPreferences('quick_reblog'));
-
   blogSelector.replaceChildren(
     ...userBlogs.map(({ name, uuid }) => Object.assign(document.createElement('option'), { value: uuid, textContent: name }))
   );

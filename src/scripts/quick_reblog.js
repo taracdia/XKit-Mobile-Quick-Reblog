@@ -42,7 +42,6 @@ let suggestableTags;
 let accountKey;
 
 let popupPosition;
-let showBlogSelector;
 let rememberLastBlog;
 let showCommentInput;
 let quickTagsIntegration;
@@ -204,7 +203,6 @@ const startLongPress = function(e) {
 export const main = async function () {
   ({
     popupPosition,
-    showBlogSelector,
     rememberLastBlog,
     showCommentInput,
     quickTagsIntegration,

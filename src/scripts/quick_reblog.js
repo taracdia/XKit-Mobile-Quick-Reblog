@@ -1,17 +1,14 @@
-import { sha256 } from '../util/crypto.js';
 import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
-import { postSelector, filterPostElements, postType } from '../util/interface.js';
+import { postSelector, postType } from '../util/interface.js';
 import { userBlogs } from '../util/user.js';
 import { getPreferences } from '../util/preferences.js';
-import { onNewPosts } from '../util/mutations.js';
 import { notify } from '../util/notifications.js';
 import { translate } from '../util/language_data.js';
 import { dom } from '../util/dom.js';
 
 const blogSelector = document.createElement('select');
 const blogAvatar = dom('div', { class: 'avatar' });
-const blogSelectorContainer = dom('div', { class: 'select-container' }, null, [blogAvatar, blogSelector]);
 const commentInput = Object.assign(document.createElement('input'), {
   placeholder: 'Comment',
   autocomplete: 'off',
@@ -37,14 +34,9 @@ const draftButton = Object.assign(document.createElement('button'), { textConten
 draftButton.dataset.state = 'draft';
 
 let lastPostID;
-let timeoutID;
 let suggestableTags;
-let accountKey;
 
-let popupPosition;
 let rememberLastBlog;
-let showCommentInput;
-let quickTagsIntegration;
 let showTagsInput;
 let showTagSuggestions;
 let reblogTag;
@@ -54,7 +46,6 @@ let alreadyRebloggedLimit;
 
 let longpress = false;
 let presstimer = null;
-let longtarget = null;
 
 const alreadyRebloggedStorageKey = 'quick_reblog.alreadyRebloggedList';
 const rememberedBlogStorageKey = 'quick_reblog.rememberedBlogs';
@@ -202,10 +193,7 @@ const startLongPress = function(e) {
 
 export const main = async function () {
   ({
-    popupPosition,
     rememberLastBlog,
-    showCommentInput,
-    quickTagsIntegration,
     showTagsInput,
     showTagSuggestions,
     reblogTag,

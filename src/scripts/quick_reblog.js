@@ -1,9 +1,9 @@
 import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
-import { postSelector } from '../util/interface.js';
 import { userBlogs } from '../util/user.js';
 
 let pressTimer = null;
+const postSelector = '[tabindex="-1"][data-id]';
 
 const reblogButtonSelector = `
 ${postSelector} footer a[href*="/reblog/"],

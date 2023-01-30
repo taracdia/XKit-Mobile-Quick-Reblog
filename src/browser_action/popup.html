@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/lib/spectrum.css">
     <link rel="stylesheet" href="popup.css">
     <link rel="stylesheet" href="configuration.css">
-    <link rel="stylesheet" href="backup.css">
     <link rel="stylesheet" href="links.css">
   </head>
   <body>
@@ -18,7 +17,6 @@
     <main>
       <nav>
         <a href="#configuration" role="button" class="selected">Configuration</a>
-        <a href="#backup" role="button">Backup</a>
         <a href="#links" role="button">Links</a>
       </nav>
       <section id="configuration" class="open">
@@ -35,22 +33,6 @@
           <p>No results found.</p>
         </div>
         <div class="scripts"></div>
-      </section>
-      <section id="backup">
-        <details id="export" open>
-          <summary><h4>Export</h4></summary>
-          <pre id="local-storage-export"></pre>
-          <div class="buttons-container">
-            <button id="copy-local">Copy All</button>
-            <button id="download-local">Download</button>
-          </div>
-        </details>
-        <details id="import">
-          <summary><h4>Import</h4></summary>
-          <label for="local-storage-import">Paste the contents of your saved backup here.</label>
-          <textarea id="local-storage-import" rows="10" spellcheck="false"></textarea>
-          <button id="restore-local"></button>
-        </details>
       </section>
       <section id="links">
         <h4>Help & information</h4>
@@ -144,6 +126,5 @@
     <script src="/lib/spectrum.js"></script>
     <script src="popup.js"></script>
     <script src="render_scripts.js"></script>
-    <script src="render_backup.js"></script>
   </body>
 </html>

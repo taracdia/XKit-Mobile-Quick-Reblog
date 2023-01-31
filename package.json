@@ -1,6 +1,4 @@
 {
-  "license": "GPL-3.0",
-  "repository": "github:AprilSylph/XKit-Rewritten",
   "scripts": {
     "test": "web-ext lint",
     "posttest": "eslint src/",
@@ -14,8 +12,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsdoc": "^39.6.4",
     "eslint-plugin-n": "^15.6.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "web-ext": "^7.4.0"
+    "eslint-plugin-promise": "^6.1.1"
   },
   "dependencies": {
     "jquery": "^3.6.3"

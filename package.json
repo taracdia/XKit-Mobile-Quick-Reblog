@@ -5,9 +5,6 @@
     "start": "web-ext run",
     "build": "web-ext build"
   },
-  "dependencies": {
-    "jquery": "^3.6.3"
-  },
   "webExt": {
     "sourceDir": "src/",
     "build": {

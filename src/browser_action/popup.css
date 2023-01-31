@@ -155,3 +155,254 @@ input:not(:first-child),
 select:not(:first-child) {
   margin-left: 1ch;
 }
+.finder {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1ch;
+  border-bottom: 1px solid rgb(var(--active-grey));
+
+  background-color: rgb(var(--white));
+}
+
+#search {
+  width: 0;
+  flex-basis: 0;
+  flex-grow: 1;
+}
+
+label[for="filter"] {
+  margin-left: 2ch;
+}
+
+.no-results {
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.scripts:empty::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+
+  color: rgb(var(--active-grey));
+  content: "Loading...";
+  font-size: 1.3125rem;
+  font-weight: 700;
+}
+
+.script.search-hidden,
+.script.filter-hidden {
+  display: none;
+}
+
+.script {
+  border-bottom: 1px dotted rgb(var(--active-grey));
+}
+
+.script summary {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1ch;
+
+  cursor: pointer;
+}
+
+.script summary::-webkit-details-marker {
+  display: none;
+}
+
+.script.disabled summary {
+  color: rgba(var(--black), .8);
+}
+
+.script summary:hover {
+  background-color: rgb(var(--passive-grey));
+}
+
+.script summary:focus {
+  background-color: rgb(var(--active-grey));
+}
+
+.script .icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+}
+
+.script .icon i {
+  font-size: 26px;
+}
+
+.script .icon,
+.script .meta,
+.script .help {
+  margin-right: 1ch;
+}
+
+.script .icon,
+.script .buttons {
+  flex-shrink: 0;
+}
+
+.script .buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+}
+
+.script .help {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-decoration: none;
+}
+
+.script .help:not([href]) i {
+  display: none;
+}
+
+.script .help:not([href])::before {
+  padding: 0 1ex;
+  border-radius: 1em;
+
+  background-color: orange;
+  color: rgb(var(--white));
+  content: 'New!';
+  line-height: 1.5;
+}
+
+.script .help i {
+  font-size: 1.25rem;
+}
+
+.script .title,
+.script .description {
+  margin: 0;
+}
+
+.script.disabled .title::after {
+  content: "(disabled)";
+  margin-left: 0.5ch;
+  font-weight: normal;
+}
+
+.script ul.preferences {
+  padding: 0 1ch;
+  margin: 1ch 0;
+
+  list-style-type: none;
+}
+
+.script .preferences:empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.script .preferences:empty::before {
+  content: "No preferences available for this script.";
+}
+
+.script li {
+  display: flex;
+  align-items: center;
+  padding: 0.5ch 0;
+}
+
+.script input[type="text"] {
+  box-sizing: border-box;
+  width: 65%;
+}
+
+.script input[type="text"],
+.script select {
+  margin-left: auto;
+}
+
+.script iframe {
+  border: none;
+  width: 100%;
+}
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+ input[type="checkbox"].toggle-button {
+  --button-height: 16px;
+  --button-half-height: 8px;
+  --button-width: 26px;
+  --button-border-width: 1px;
+  /* dot-size = button-height - 2*dot-margin - 2*button-border-width */
+  --dot-size: 10px;
+  --dot-margin: 2px;
+  /* --dot-transform-x = button-width - 2*dot-margin - dot-size - 2*button-border-width */
+  --dot-transform-x: 10px;
+  --border-color: hsla(210,4%,10%,.14);
+}
+
+input[type="checkbox"].toggle-button {
+  appearance: none;
+  padding: 0;
+  margin: 0;
+  border: var(--button-border-width) solid var(--border-color);
+  height: var(--button-height);
+  width: var(--button-width);
+  border-radius: var(--button-half-height);
+  background: var(--in-content-button-background);
+  box-sizing: border-box;
+}
+input[type="checkbox"].toggle-button:enabled:hover {
+  background: var(--in-content-button-background-hover);
+  border-color: var(--border-color);
+}
+input[type="checkbox"].toggle-button:enabled:active {
+  background: var(--in-content-button-background-active);
+  border-color: var(--border-color);
+}
+
+input[type="checkbox"].toggle-button:checked {
+  background: var(--in-content-primary-button-background);
+  border-color: var(--in-content-primary-button-background-hover);
+}
+input[type="checkbox"].toggle-button:checked:hover {
+  background: var(--in-content-primary-button-background-hover);
+  border-color: var(--in-content-primary-button-background-active);
+}
+input[type="checkbox"].toggle-button:checked:active {
+  background: var(--in-content-primary-button-background-active);
+  border-color: var(--in-content-primary-button-background-active);
+}
+
+input[type="checkbox"].toggle-button::before {
+  display: block;
+  content: "";
+  background: #fff;
+  height: var(--dot-size);
+  width: var(--dot-size);
+  margin: var(--dot-margin);
+  border-radius: 50%;
+  outline: 1px solid var(--border-color);
+  transition: transform 100ms;
+}
+input[type="checkbox"].toggle-button:checked::before {
+  transform: translateX(var(--dot-transform-x));
+}
+input[type="checkbox"].toggle-button:dir(rtl)::before {
+  scale: -1;
+}

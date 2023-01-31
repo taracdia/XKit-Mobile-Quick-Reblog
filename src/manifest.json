@@ -1,13 +1,12 @@
 {
   "manifest_version": 2,
-  "name": "XKit Rewritten",
+  "name": "Quick Reblog Mobile",
   "version": "0.21.0",
 
-  "short_name": "XKit",
-  "author": "April Sylph",
+  "short_name": "Quick Reblog Mobile",
+  "author": "Tara Dia",
   "homepage_url": "https://github.com/AprilSylph/XKit-Rewritten/wiki",
 
-  "description": "The enhancement suite for Tumblr's new web interface",
   "icons": {
     "16": "icons/16.png",
     "32": "icons/32.png",
@@ -50,17 +49,8 @@
       ],
       "run_at": "document_end",
       "js": [
-        "lib/browser-polyfill.min.js",
         "lib/jquery.min.js",
         "content_scripts/main.js"
-      ],
-      "css": [
-        "content_scripts/control_buttons.css",
-        "content_scripts/meatballs.css",
-        "content_scripts/sidebar.css",
-        "content_scripts/modals.css",
-        "content_scripts/notifications.css",
-        "content_scripts/post_actions.css"
       ]
     }
   ],

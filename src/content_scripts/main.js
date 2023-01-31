@@ -78,7 +78,6 @@
   };
 
   const init = async function () {
-    $('style.xkit').remove();
 
     browser.storage.onChanged.addListener(onStorageChanged);
 

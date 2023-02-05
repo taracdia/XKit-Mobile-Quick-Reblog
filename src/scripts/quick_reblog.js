@@ -2,7 +2,6 @@ import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
 import { userBlogs } from '../util/user.js';
 
-let pressTimer = null;
 const postSelector = '[tabindex="-1"][data-id]';
 
 const reblogButtonSelector = `
@@ -42,45 +41,62 @@ const reblogOnLongClick = async ({ currentTarget }) => {
   }
 };
 
-const cancelLongPress = function(e) {
-  if (pressTimer !== null) {
-      clearTimeout(pressTimer);
-      pressTimer = null;
-  }
-};
-
-const startLongPress = function(e) {
-  if (e.type === "click" && e.button !== 0) {
-      return;
-  }
-
-  if (pressTimer === null) {
-      pressTimer = setTimeout(function() {
-          reblogOnLongClick(e);
-          // this prevents the short click opening the usual reblog modal
-          e.currentTarget.style.pointerEvents = 'none';
-      }, 500);
-  }
-
+function absorbEvent(event) {
+  var e = event || window.event;
+  e.preventDefault && e.preventDefault();
+  e.stopPropagation && e.stopPropagation();
+  e.cancelBubble = true;
+  e.returnValue = false;
   return false;
-};
+}
+
+function start(event) {
+  var e = event || window.event;
+  reblogOnLongClick(e)
+  e.preventDefault && e.preventDefault();
+  e.stopPropagation && e.stopPropagation();
+  e.cancelBubble = true;
+  e.returnValue = false;
+  return false;
+}
+
+function preventLongPressMenu(node) {
+  node.ontouchstart = start;
+  node.ontouchmove = absorbEvent;
+  node.ontouchend = absorbEvent;
+  node.ontouchcancel = absorbEvent;
+}
+
+function removeListeners(node) {
+  node.removeEventListener('ontouchstart', start)
+  node.removeEventListener('ontouchmove', absorbEvent)
+  node.removeEventListener('ontouchend', absorbEvent)
+  node.removeEventListener('ontouchcancel', absorbEvent)
+}
+
+const affectedElements = []
 
 export const main = async function () {
-  $(document.body).on('mousedown', reblogButtonSelector, startLongPress);
-  $(document.body).on('touchstart', reblogButtonSelector, startLongPress);
-  $(document.body).on('mouseout', reblogButtonSelector, cancelLongPress);
-  $(document.body).on('touchend', reblogButtonSelector, cancelLongPress);
-  $(document.body).on('touchleave', reblogButtonSelector, cancelLongPress);
-  $(document.body).on('touchcancel', reblogButtonSelector, cancelLongPress);
+  var elems = document.querySelectorAll(reblogButtonSelector);
+
+  for(let i = 0; i< elems.length; i++) {
+    const ancestor = elems[i].parentElement.parentElement.parentElement
+
+    const children = ancestor.getElementsByTagName('*')
+    for(let j = 0; j< children.length; j++) {
+      affectedElements.push(children[j])
+    }
+  }
+
+  for(let j = 0; j< affectedElements.length; j++) {
+    preventLongPressMenu(affectedElements[j])
+  }
 };
 
 export const clean = async function () {
-  $(document.body).off('mousedown', reblogButtonSelector, startLongPress);
-  $(document.body).off('touchstart', reblogButtonSelector, startLongPress);
-  $(document.body).off('mouseout', reblogButtonSelector, cancelLongPress);
-  $(document.body).off('touchend', reblogButtonSelector, cancelLongPress);
-  $(document.body).off('touchleave', reblogButtonSelector, cancelLongPress);
-  $(document.body).off('touchcancel', reblogButtonSelector, cancelLongPress);
+  for(let j = 0; j< affectedElements.length; j++) {
+    removeListeners(affectedElements[j])
+  }
 };
 
 export const stylesheet = true;

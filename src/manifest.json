@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Quick Reblog Mobile",
-  "version": "0.22.0",
+  "version": "0.23.0",
 
   "short_name": "Quick Reblog Mobile",
   "author": "Tara Dia",
@@ -34,12 +34,18 @@
     "open_in_tab": false
   },
 
-  "permissions": [ "storage" ],
+  "permissions": [ "contextualIdentities",
+  "cookies",
+  "tabs",
+  "webRequest",
+  "webRequestBlocking",
+  "storage",
+  "<all_urls>" ],
   "web_accessible_resources": [ "*.js", "*.json", "*.css", "*.svg" ],
   "content_scripts": [
     {
       "matches": [
-        "*://www.tumblr.com/*"
+        "*://*.tumblr.com/*"
       ],
       "exclude_matches": [
         "*://www.tumblr.com/login",

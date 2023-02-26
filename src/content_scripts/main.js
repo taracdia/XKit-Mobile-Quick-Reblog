@@ -93,7 +93,15 @@
     window.requestAnimationFrame(() => isReactLoaded() ? resolve() : waitForReactLoaded().then(resolve));
   });
 
+  console.log('help')
+
   if (redpop) {
-    isReactLoaded() ? init() : waitForReactLoaded().then(init);
+    if (isReactLoaded()){
+      init()
+    } else {
+      waitForReactLoaded().then(init)
+    }
+  } else {
+    init()
   }
 }

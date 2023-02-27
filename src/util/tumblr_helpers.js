@@ -40,6 +40,9 @@ export const apiFetch = async function (...args) {
         }
       }
 
+      console.log(window.tumblr)
+      console.log(window.Tumblr)
+
       return window.tumblr.apiFetch(resource, init);
     },
     args

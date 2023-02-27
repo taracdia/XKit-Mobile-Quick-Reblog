@@ -2,22 +2,26 @@ import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
 import { userBlogs } from '../util/user.js';
 
-const postSelector = '[tabindex="-1"][data-id]';
-
+const postSelectorDashboard = '[tabindex="-1"][data-id]';
+const postSelectorOutside = 'section#posts div.container div.main article'
 const reblogButtonSelectorInDashboard = `
-${postSelector} footer a[href*="/reblog/"],
-${postSelector} footer button[aria-label="Reblog"]:not([role])
+${postSelectorDashboard} footer a[href*="/reblog/"],
+${postSelectorDashboard} footer button[aria-label="Reblog"]:not([role])
 `;
 
 const reblogButtonSelectorOutsideOfDashboard = `div.control.reblog-control`;
 
 const reblogOnLongClick = async ({ currentTarget }, location) => {
   console.log('reblog')
-  const currentReblogButton = currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement;
+  console.log(location)
 
-  const postElement = currentTarget.closest(postSelector);
+  const isDashboard = location === 'dashboard'
+  const currentReblogButton = isDashboard ? currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement : currentTarget;
+
+  const postElement = isDashboard ? currentTarget.closest(postSelectorDashboard) : currentTarget.closest(postSelectorOutside);
   const postID = postElement.dataset.id;
   const state = 'published'
+  console.log(userBlogs)
 
   const blog = userBlogs[0].uuid;
   const tags = ''
@@ -73,7 +77,7 @@ function startOutside(event) {
   return false;
 }
 
-function preventLongPressMenuDash(node, location) {
+function preventLongPressMenu(node, location) {
   if (location === 'dashboard'){
     node.ontouchstart = startDash;
   } else {
@@ -145,18 +149,18 @@ function waitForElement(callback, timeout = 15000) {
 }
 
 
-function setListenersOnThisPage(){
+function setListenersOnThisPage(location){
   removeListenersOnThisPage()
   affectedElements = []
 
-  function callback(location){
+  function callback(){
     if (location === 'dashboard'){
       affectedElements = getAffectedElementsInDash()
     } else {
       affectedElements = getAffectedElementsOutside()
     }
     for(let j = 0; j< affectedElements.length; j++) {
-      preventLongPressMenuDash(affectedElements[j])
+      preventLongPressMenu(affectedElements[j], location)
     }
   }
 
@@ -172,13 +176,25 @@ function removeListenersOnThisPage(){
 
 export const main = async function () {
   console.log('main')
-setListenersOnThisPage()
 let currentUrl = location.href;
+if (currentUrl.includes('dashboard')){
+  setListenersOnThisPage('dashboard');
+
+} else {
+  setListenersOnThisPage('outside');
+
+}
 
 setInterval(() => {
   if (location.href !== currentUrl) {
     currentUrl = location.href;
-    setListenersOnThisPage();
+    if (currentUrl.includes('dashboard')){
+      setListenersOnThisPage('dashboard');
+
+    } else {
+      setListenersOnThisPage('outside');
+
+    }
   }
 }, 500)
 };

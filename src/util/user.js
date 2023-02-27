@@ -2,6 +2,8 @@ import { apiFetch } from './tumblr_helpers.js';
 
 const fetchedUserInfo = await apiFetch('/v2/user/info').catch(() => ({ response: {} }));
 
+console.log(fetchedUserInfo)
+
 /**
  * {object?} userInfo - The contents of the /v2/user/info API endpoint
  */

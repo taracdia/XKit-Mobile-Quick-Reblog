@@ -1,0 +1,4 @@
+/**
+ * {string} blog - An array of blog objects the current user has post access to
+ */
+export const blog_uuid = 'TARGET BLOG UUID'

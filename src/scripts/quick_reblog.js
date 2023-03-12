@@ -1,6 +1,6 @@
 import { timelineObject } from '../util/react_props.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
-import { userBlogs } from '../util/user.js';
+import { blog_uuid } from '../util/blog_uuid.js';
 
 const postSelectorDashboard = '[tabindex="-1"][data-id]';
 const postSelectorOutside = 'section#posts div.container div.main article'
@@ -21,9 +21,8 @@ const reblogOnLongClick = async ({ currentTarget }, location) => {
   const postElement = isDashboard ? currentTarget.closest(postSelectorDashboard) : currentTarget.closest(postSelectorOutside);
   const postID = postElement.dataset.id;
   const state = 'published'
-  console.log(userBlogs)
 
-  const blog = userBlogs[0].uuid;
+  const blog = blog_uuid
   const tags = ''
   const { blog: { uuid: parentTumblelogUUID }, reblogKey } = await timelineObject(postElement);
 

@@ -1,3 +1,3 @@
 # XKit-Mobile-Quick-Reblog
-Removing most functionality and adding the ability to quick reblog easily in mobile
-You need a .env file with REACT_APP_BLOG_UUID defined as the target blog's uuid
+Removing most functionality and adding the ability to quick reblog even easier in mobile android firefox
+Make blog_uuid.js.example with proper uuid

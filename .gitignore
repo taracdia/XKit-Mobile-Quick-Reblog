@@ -6,3 +6,4 @@ release-notes.md
 .vscode/
 .DS_Store
 .env
+src/util/blog_uuid.js
